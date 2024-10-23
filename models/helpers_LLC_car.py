@@ -319,33 +319,22 @@ class LocallyConnected2d(nn.Module):
         self.stride = _pair(stride)
         
     def forward(self,x):
-        #print('archor:', self.output_size)
-        #print("Input to conv: ", x.shape)
-        
-        
+
         _, c, h, w = x.size()
         kh, kw = self.kernel_size
         dh, dw = self.stride
         x = x.unfold(2, kh, dh).unfold(3, kw, dw)
-       # print("After unfold:", x.shape)
         
         
         x = x.contiguous().view(*x.size()[:-2], -1)
-        #print("After contiguous", x.shape)
 
-        #if (self.weight.shape[3] - x.shape[3] == 1):
-          #x = F.pad(x, pad=(0,0,0,1,0,1))
-        ##elif (self.weight.shape[3] - x.shape[3] == 2):
+    
         x = F.pad(x, pad=(0,0,1,1,1,1))
-        #else:
-          #x = x
-       
-        
+
         
         out = (x.unsqueeze(1) * self.weight).sum([2, -1])
         
-        #print("Out", x.shape)
-        
+
         if self.bias is not None:
             out += self.bias
         return out
